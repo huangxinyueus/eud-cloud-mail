@@ -145,7 +145,7 @@ const emailService = {
 
 		const { resendTokens, r2Domain, send } = await settingService.query(c);
 
-		let { attDataList, html } = await attService.toImageUrlHtml(c, content, r2Domain);
+		let { imageDataList, html } = await attService.toImageUrlHtml(c, content);
 
 		if (send === settingConst.send.CLOSE) {
 			throw new BizError(t('disabledSend'), 403);
@@ -173,11 +173,11 @@ const emailService = {
 		}
 
 
-		if (attDataList.length > 0 && !r2Domain) {
+		if (imageDataList.length > 0 && !r2Domain) {
 			throw new BizError(t('noOsDomainSendPic'));
 		}
 
-		if (attDataList.length > 0 && !await r2Service.hasOSS(c)) {
+		if (imageDataList.length > 0 && !await r2Service.hasOSS(c)) {
 			throw new BizError(t('noOsSendPic'));
 		}
 
@@ -242,6 +242,7 @@ const emailService = {
 
 		const resend = new Resend(resendToken);
 
+		//如果是分开发送
 		if (manyType === 'divide') {
 
 			let sendFormList = [];
@@ -275,7 +276,7 @@ const emailService = {
 				subject: subject,
 				text: text,
 				html: html,
-				attachments: attachments
+				attachments: [...imageDataList, ...attachments]
 			};
 
 			if (sendType === 'reply') {
@@ -296,7 +297,10 @@ const emailService = {
 			throw new BizError(error.message);
 		}
 
-		html = this.imgReplace(html, null, r2Domain);
+		imageDataList = imageDataList.map(item => ({...item, contentId: `<${item.contentId}>`}))
+
+		//把图片标签cid标签切换会通用url
+		html = this.imgReplace(html, imageDataList, r2Domain);
 
 		const emailData = {};
 		emailData.sendEmail = accountRow.email;
@@ -348,11 +352,12 @@ const emailService = {
 		}
 
 		const emailRowList = await Promise.all(
+
 			emailDataList.map(async (emailData) => {
 				const emailRow = await orm(c).insert(email).values(emailData).returning().get();
 
-				if (attDataList.length > 0) {
-					await attService.saveArticleAtt(c, attDataList, userId, accountId, emailRow.emailId);
+				if (imageDataList.length > 0) {
+					await attService.saveArticleAtt(c, imageDataList, userId, accountId, emailRow.emailId);
 				}
 
 				if (attachments?.length > 0 && await r2Service.hasOSS(c)) {

@@ -42,6 +42,22 @@ const settingService = {
 
 		domainList = domainList.map(item => '@' + item);
 		setting.domainList = domainList;
+
+
+		let linuxdoSwitch = c.env.linuxdo_switch;
+
+		if (typeof linuxdoSwitch === 'string' && linuxdoSwitch === 'true') {
+			linuxdoSwitch = true
+		} else if (linuxdoSwitch === true) {
+			linuxdoSwitch = true
+		} else {
+			linuxdoSwitch = false
+		}
+
+		setting.linuxdoClientId = c.env.linuxdo_client_id;
+		setting.linuxdoCallbackUrl = c.env.linuxdo_callback_url;
+		setting.linuxdoSwitch = linuxdoSwitch;
+
 		c.set?.('setting', setting);
 		return setting;
 	},
@@ -187,7 +203,11 @@ const settingService = {
 			noticeWidth: settingRow.noticeWidth,
 			noticeOffset: settingRow.noticeOffset,
 			notice: settingRow.notice,
-			loginDomain: settingRow.loginDomain
+			loginDomain: settingRow.loginDomain,
+			linuxdoClientId: settingRow.linuxdoClientId,
+			linuxdoCallbackUrl: settingRow.linuxdoCallbackUrl,
+			linuxdoSwitch: settingRow.linuxdoSwitch,
+			minEmailPrefix: settingRow.minEmailPrefix
 		};
 	}
 };

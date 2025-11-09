@@ -191,6 +191,7 @@ const en = {
     delSuccessMsg: 'Deleted successfully',
     emptyEmailMsg: 'Email cannot be empty',
     notEmailMsg: 'Invalid email',
+    minEmailPrefix: 'Email must be at least {msg} characters',
     emptyPwdMsg: 'Password cannot be empty',
     pwdLengthMsg: 'Password must be at least 6 characters',
     confirmPwdFailMsg: 'The two passwords do not match',
@@ -303,7 +304,10 @@ const en = {
     show: 'Show',
     hide: 'Hide',
     onlyName: 'Only name',
-    emailText: 'Email Text'
+    emailText: 'Email Text',
+    emailPrefix: 'Email Prefix',
+    atLeast: 'At Least',
+    character: ''
 }
 
 export default en

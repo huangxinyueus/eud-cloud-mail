@@ -61,7 +61,16 @@
                              v-model="setting.manyEmail"/>
                 </div>
               </div>
-
+              <div class="setting-item">
+                <div>
+                  <span>{{ $t('emailPrefix') }}</span>
+                </div>
+                <div class="forward">
+                  <el-button class="opt-button" size="small" type="primary" @click="openEmailPrefix">
+                    <Icon icon="fluent:settings-48-regular" width="18" height="18"/>
+                  </el-button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -349,7 +358,7 @@
               <div class="concerning-item">
                 <span>{{ $t('version') }} :</span>
                 <el-badge is-dot :hidden="!hasUpdate">
-                  <el-button @click="jump('https://github.com/eoao/cloud-mail/releases')">
+                  <el-button @click="jump('https://github.com/maillab/cloud-mail/releases')">
                     {{ currentVersion }}
                     <template #icon>
                       <Icon icon="qlementine-icons:version-control-16" style="font-size: 20px" color="#1890FF"/>
@@ -360,7 +369,7 @@
               <div class="concerning-item">
                 <span>{{ $t('community') }} : </span>
                 <div class="community">
-                  <el-button @click="jump('https://github.com/eoao/cloud-mail')">
+                  <el-button @click="jump('https://github.com/maillab/cloud-mail')">
                     Github
                     <template #icon>
                       <Icon icon="codicon:github-inverted" width="22" height="22"/>
@@ -704,6 +713,16 @@
           </div>
         </form>
       </el-dialog>
+      <el-dialog v-model="emailPrefixShow" :title="t('emailPrefix')" width="30"  >
+        <div class="email-prefix">
+          <div>{{ t('atLeast') }}</div>
+          <el-input-number v-model="minEmailPrefix" :min="1" :max="20" @change="EmailPrefixChange" style="width: 150px" >
+            <template #suffix>
+              <span>{{ t('character') }}</span>
+            </template>
+          </el-input-number>
+        </div>
+      </el-dialog>
     </el-scrollbar>
   </div>
 </template>
@@ -730,7 +749,7 @@ defineOptions({
   name: 'sys-setting'
 })
 
-const currentVersion = 'v2.3.0'
+const currentVersion = 'v2.4.0'
 const hasUpdate = ref(false)
 let getUpdateErrorCount = 1;
 const {t, locale} = useI18n();
@@ -747,6 +766,7 @@ const tgSettingShow = ref(false)
 const noticePopupShow = ref(false)
 const thirdEmailShow = ref(false)
 const forwardRulesShow = ref(false)
+const emailPrefixShow = ref(false)
 const showResendList = ref(false)
 const settingStore = useSettingStore();
 const uiStore = useUiStore();
@@ -756,6 +776,7 @@ const settingLoading = ref(false)
 const clearS3Loading = ref(false)
 const r2DomainInput = ref('')
 const loginOpacity = ref(0)
+const minEmailPrefix = ref(0)
 const backgroundUrl = ref('')
 let backgroundFile = {}
 const showSetBackground = ref(false)
@@ -838,6 +859,7 @@ function getSettings() {
     settingStore.domainList = settingData.domainList;
     resendTokenForm.domain = setting.value.domainList[0]
     loginOpacity.value = setting.value.loginOpacity
+    minEmailPrefix.value = setting.value.minEmailPrefix
     firstLoading.value = false
     backgroundUrl.value = setting.value.background?.startsWith('http') ? setting.value.background : ''
     editTitle.value = setting.value.title
@@ -897,7 +919,7 @@ const resendList = computed(() => {
 
 function getUpdate() {
   if (getUpdateErrorCount > 5 || !getUpdateErrorCount) return
-  axios.get('https://api.github.com/repos/eoao/cloud-mail/releases/latest').then(({data}) => {
+  axios.get('https://api.github.com/repos/maillab/cloud-mail/releases/latest').then(({data}) => {
     hasUpdate.value = data.name !== currentVersion
     getUpdateErrorCount = 0
   }).catch(e => {
@@ -991,6 +1013,10 @@ function openThirdEmailSetting() {
     forwardEmail.value.push(...list)
   }
   thirdEmailShow.value = true
+}
+
+function openEmailPrefix() {
+  emailPrefixShow.value = true
 }
 
 function openForwardRules() {
@@ -1110,6 +1136,17 @@ function doOpacityChange() {
   form.loginOpacity = loginOpacity.value
   editSetting(form, true)
 }
+
+function doEmailPrefix() {
+  const form = {}
+  form.minEmailPrefix = minEmailPrefix.value
+  editSetting(form, true)
+}
+
+const EmailPrefixChange = debounce(doEmailPrefix, 1000, {
+  leading: false,
+  trailing: true
+})
 
 const opacityChange = debounce(doOpacityChange, 1000, {
   leading: false,
@@ -1279,6 +1316,7 @@ function editSetting(settingForm, refreshStatus = true) {
     addS3Show.value = false
   }).catch((e) => {
     loginOpacity.value = setting.value.loginOpacity
+    minEmailPrefix.value = setting.value.minEmailPrefix
     setting.value = {...setting.value, ...JSON.parse(backup)}
   }).finally(() => {
     settingLoading.value = false
@@ -1350,13 +1388,13 @@ function editSetting(settingForm, refreshStatus = true) {
 }
 
 .background {
-  width: 230px;
-  height: 120px;
+  width: 249px;
+  height: 140px;
   border-radius: 4px;
   border: 1px solid var(--light-border);
   @media (max-width: 500px) {
-    width: 150px;
-    height: 83px;
+    width: 160px;
+    height: 90px;
   }
 }
 
@@ -1630,6 +1668,11 @@ function editSetting(settingForm, refreshStatus = true) {
 
 .opt-button {
   width: fit-content !important;
+}
+
+.email-prefix {
+  display: flex;
+  justify-content: space-between;
 }
 
 .s3-button {

@@ -45,6 +45,7 @@ export const setting = sqliteTable('setting', {
 	customDomain: text('custom_domain').default('').notNull(),
 	tgMsgFrom: text('tg_msg_from').default('only-name').notNull(),
 	tgMsgTo: text('tg_msg_to').default('show').notNull(),
-	tgMsgText: text('tg_msg_text').default('hide').notNull()
+	tgMsgText: text('tg_msg_text').default('hide').notNull(),
+	minEmailPrefix: integer('min_email_prefix').default(0).notNull()
 });
 export default setting

@@ -193,6 +193,7 @@ const zh = {
     notEmailMsg: '输入的邮箱不合法',
     emptyPwdMsg: '密码不能为空',
     pwdLengthMsg: '密码最少六位',
+    minEmailPrefix: '邮箱名不能小于{msg}位',
     confirmPwdFailMsg: '两次密码输入不一致',
     emptyRegKeyMsg: '注册码不能为空',
     regSuccessMsg: '注册成功',
@@ -303,6 +304,9 @@ const zh = {
     show: '显示',
     hide: '隐藏',
     onlyName: '仅名字',
-    emailText: '邮件文本'
+    emailText: '邮件文本',
+    emailPrefix: '邮箱前缀',
+    atLeast: '至少',
+    character: '位'
 }
 export default zh

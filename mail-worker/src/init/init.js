@@ -23,8 +23,37 @@ const init = {
 		await this.v1_7DB(c);
 		await this.v2DB(c);
 		await this.v2_3DB(c);
+		await this.v2_4DB(c);
 		await settingService.refresh(c);
 		return c.text(t('initSuccess'));
+	},
+
+	async v2_4DB(c) {
+		try {
+			await c.env.db.prepare(`
+				CREATE TABLE IF NOT EXISTS oauth (
+					oauth_id INTEGER PRIMARY KEY AUTOINCREMENT,
+					oauth_user_id TEXT,
+					username TEXT,
+					name TEXT,
+					avatar TEXT,
+					active INTEGER,
+					trust_level INTEGER,
+					silenced INTEGER,
+					create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+					platform INTEGER NOT NULL DEFAULT 0,
+					user_id INTEGER NOT NULL DEFAULT 0
+				)
+			`).run();
+		} catch (e) {
+			console.error(e)
+		}
+
+		try {
+			await c.env.db.prepare(`ALTER TABLE setting ADD COLUMN min_email_prefix INTEGER NOT NULL DEFAULT 1;`).run();
+		} catch (e) {
+			console.error(e)
+		}
 	},
 
 	async v2_3DB(c) {
@@ -41,7 +70,7 @@ const init = {
 		}
 
 		try {
-			await c.env.db.prepare(`ALTER TABLE setting ADD COLUMN tg_msg_text TEXT NOT NULL DEFAULT 'hide';`).run();
+			await c.env.db.prepare(`ALTER TABLE setting ADD COLUMN tg_msg_text TEXT NOT NULL DEFAULT 'show';`).run();
 		} catch (e) {
 			console.error(e)
 		}
@@ -75,15 +104,7 @@ const init = {
 
 		const noticeContent = '本项目仅供学习交流，禁止用于违法业务\n' +
 			'<br>\n' +
-			'请遵守当地法规，作者不承担任何法律责任\n' +
-			'<div style="display: flex;gap: 18px;margin-top: 10px;">\n' +
-			'<a href="https://github.com/eoao/cloud-mail" target="_blank" >\n' +
-			'<img src="https://api.iconify.design/codicon:github-inverted.svg" alt="GitHub" width="25" height="25" />\n' +
-			'</a>\n' +
-			'<a href="https://t.me/cloud_mail_tg" target="_blank" >\n' +
-			'<img src="https://api.iconify.design/logos:telegram.svg" alt="GitHub" width="25" height="25" />\n' +
-			'</a>\n' +
-			'</div>\n'
+			'请遵守当地法规，作者不承担任何法律责任'
 
 		const ADD_COLUMN_SQL_LIST = [
 			`ALTER TABLE setting ADD COLUMN reg_verify_count INTEGER NOT NULL DEFAULT 1;`,
