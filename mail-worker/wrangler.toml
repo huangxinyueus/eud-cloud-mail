@@ -13,11 +13,11 @@ enabled = true
 
 #[[kv_namespaces]]
 #binding = "kv"			#kv绑定名默认不可修改
-#id = ""					#kv数据库id
+#id = "871b16b72eb14054a8480be7eda5f6c1"					#kv数据库id
 
 #[[r2_buckets]]
 #binding = "r2"			#r2对象存储绑定名默认不可修改
-#bucket_name = ""		#r2对象存储桶的名字
+#bucket_name = "edu-mail"		#r2对象存储桶的名字
 
 [assets]
 binding = "assets"		#静态资源绑定名默认不可修改
